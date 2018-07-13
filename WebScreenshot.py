@@ -1,6 +1,7 @@
 # coding=utf-8
 
-#这段代码主要使用selenium模块，使用Firefox里的geckodriver来打开一个网页，并截图
+#这段代码主要使用selenium模块，使用Firefox里的geckodriver来打开一个网页，并截图，
+
 
 from selenium import webdriver
 import time
