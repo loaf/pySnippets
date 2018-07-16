@@ -2,9 +2,10 @@
 
 import pandas as pd
 
+
 '''
-f=open('../../Quant/stock/Data/SZ/000835.SZ.CSV')
-df=pd.read_csv(f)
+f = open('../../Quant/stock/Data/SZ/000835.SZ.CSV')
+df = pd.read_csv(f)
 
 i=1
 j=1
@@ -44,6 +45,7 @@ def _1map(data, exp):
 if __name__ == "__main__":
     inp = [{'c1':10, 'c2':100}, {'c1':11,'c2':110}, {'c1':12,'c2':120}]
     df = pd.DataFrame(inp)
+
     temp = _map(df, lambda ele: ele+1 )
     print(temp)
 
