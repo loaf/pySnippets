@@ -3,10 +3,20 @@
 import pandas as pd
 
 
-'''
-f = open('../../Quant/stock/Data/SZ/000835.SZ.CSV')
-df = pd.read_csv(f)
 
+f = open('../../Quant/stock/Data/SZ/000835.SZ.CSV')
+df = pd.read_csv(f,usecols=[0,2,4,5,6,7,12,13])
+
+
+df=df.dropna()
+print(len(df))
+df=df.drop_duplicates()
+df.sort_index(by=['日期'])
+df=df.reset_index(drop=True)
+print(df.head())
+print(len(df))
+
+'''
 i=1
 j=1
 #按行遍历
@@ -26,6 +36,8 @@ for i in df.columns:
 #对每行操作
 for i in range(0,len(df)):
     print(df.iloc[i]['最高价(元)']/df.iloc[i]['开盘价(元)'])
+'''
+
 '''
 
 def _map(data, exp):
@@ -52,3 +64,4 @@ if __name__ == "__main__":
     _temp = _1map(df, lambda ele: ele+1)
     res_data = pd.DataFrame(_temp)         # 对2级list转换成DataFrame
     print(res_data)
+'''
