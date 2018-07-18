@@ -1,3 +1,4 @@
+# copy from https://github.com/isayme/smzdm.git
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -7,8 +8,8 @@ import sys
 import requests
 import re
 
-SMZDM_USERNAME = os.getenv('SMZDM_DAILY_USERNAME') or '我的用户名' # username or email
-SMZDM_PASSWORD = os.getenv('SMZDM_DAILY_PASSWORD') or '我的密码' # password
+SMZDM_USERNAME = os.getenv('SMZDM_DAILY_USERNAME') or '脦脪碌脛脫脙禄搂脙没' # username or email
+SMZDM_PASSWORD = os.getenv('SMZDM_DAILY_PASSWORD') or '脦脪碌脛脙脺脗毛' # password
 
 class SMZDMDailyException(Exception):
     def __init__(self, req):
