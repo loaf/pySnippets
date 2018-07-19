@@ -18,7 +18,7 @@ def clearData(data):
     data = data.reset_index(drop=True) #重编索引号
     return data
 
-def searchInpoint(data,ix):  #查找有效的入市点
+def searchInPoint(data,ix):  #查找有效的入市点
     curTime = data.iloc[i]['日期']
     curPrice = data.iloc[i]['收盘价(元)']
     j=ix+1
@@ -32,8 +32,21 @@ def searchInpoint(data,ix):  #查找有效的入市点
         j=j+1
     return j
 
-def searchOutpoint(data,ix): #查找有效的出市点
+def searchOutPoint(data,ix): #查找有效的出市点
+    ...
     return ix
+
+def SaveInOutPoint(InPoint,OutPoint):  #将入市点，出市点和间隔交易日记录下来
+    ...
+    return True
+
+def SaveToInPointDatabase(): #将入市点前PreDay天的数据保存到待分析的材料库，可以根据上面的outTime和intervalDay为这些数据打上带权重的标签
+    ...
+    return True
+
+def SaveToOutPointDatabase(): #将出市点前PreDay天的数据保存到待分析的材料库，分析出市的的前置规律，不过，因为规则已确定，有没有必要另说
+    ...
+    return True
 
 if __name__ == "__main__":
     df=getDataFrame('../../Quant/stock/Data/SZ/000835.SZ.CSV')
@@ -42,10 +55,12 @@ if __name__ == "__main__":
     for i in range(5, len(df)):
         curTime=df.iloc[i]['日期']
         curPrice=df.iloc[i]['收盘价(元)']
-        #if searchSegment(df,i)>0
+
+        #SaveInOutPoint(inPoint,outPoint)
+        SaveToInPointDatabase()#将入市点前n天的数据放到一个列表中，相当于用6*5个参数表示前5天的一个形态，然后加上一个间隔天数，一个最终幅度，用来标签权重
+        SaveToOutPointDatabase() #将出市点前5天的数据到表一个列表中
 
     #print(df.iloc[i]['最高价(元)'] / df.iloc[i]['开盘价(元)'])
-
     print(df.head())
 
 '''
