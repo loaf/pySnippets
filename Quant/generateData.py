@@ -5,6 +5,9 @@ rTP=1.0 #Take Profit止盈为100%，相当于翻了一倍
 rSL=0.1 #Stop loss止损 10%
 PreDay=5 #前置天数
 ValidSegment=[[]] #记录有效的段，由一个3元数组组成，一个是入口的ID，一个是出口的ID，一个是段的跨度n
+PreData2D=[[]] #记录前5天的数据形成的2维数组
+PreDataList=[] #前5天的数列
+
 
 def getDataFrame(fileName):
     f=open(fileName)
@@ -32,6 +35,10 @@ def searchInPoint(data,ix):  #验证此点是否有效的入市点，如果是�
             j=searchOutPoint(data,j)
             break
         j=j+1
+
+    if j==len(data)-1: #如果直到最后一行，既不满足有效高度，又没有止损，可认为是无效的数据
+        j=-1
+
     return j
 
 def searchOutPoint(data,ix): #从当前点按动态止赢的方法查找有效的出市点
@@ -69,21 +76,40 @@ if __name__ == "__main__":
 
         if  outIX > 0:
             ValidSegment.append([i, outIX, outIX-i])
-            #print(i,outIX,outIX-i)
 
+    for i in range(1,len(ValidSegment)): #第0行是空值
 
+        IXinpoint=ValidSegment[i][0]
+        IXoutpoint=ValidSegment[i][1]
+        MaxHighRate=(df.iloc[IXoutpoint]['收盘价(元)']-df.iloc[IXinpoint]['收盘价(元)'])/df.iloc[IXinpoint]['收盘价(元)']
 
+        PreDataList=['IN']
+        PreDataList.append(df.iloc[IXinpoint]['代码'])
+        PreDataList.append(df.iloc[IXinpoint]['日期'])
+        for j in list(range(5,0,-1)):
+            PreDataList.append(df.iloc[IXinpoint - j]['开盘价(元)'])
+            PreDataList.append(df.iloc[IXinpoint - j]['最高价(元)'])
+            PreDataList.append(df.iloc[IXinpoint - j]['最低价(元)'])
+            PreDataList.append(df.iloc[IXinpoint - j]['收盘价(元)'])
+            PreDataList.append(df.iloc[IXinpoint - j]['均价(元)'])
+            PreDataList.append(df.iloc[IXinpoint - j]['换手率(%)'])
+        PreDataList.append(ValidSegment[i][2])
+        PreDataList.append(MaxHighRate)
 
+        PreData2D.append(PreDataList)
+        #print(PreDataList)
 
         #SaveInOutPoint(inPoint,outPoint)
-        SaveToInPointDatabase()#将入市点前n天的数据放到一个列表中，相当于用6*5个参数表示前5天的一个形态，然后加上一个间隔天数，一个最终幅度，用来标签权重
-        SaveToOutPointDatabase() #将出市点前5天的数据到表一个列表中
+        #SaveToInPointDatabase()#将入市点前n天的数据放到一个列表中，相当于用6*5个参数表示前5天的一个形态，然后加上一个间隔天数，一个最终幅度，用来标签权重
+        #SaveToOutPointDatabase() #将出市点前5天的数据到表一个列表中
 
     #print(df.iloc[i]['最高价(元)'] / df.iloc[i]['开盘价(元)'])
    # ValidSegment[0]=[2,3,4]
     #ValidSegment.append([1,2,3])
     dfV=pd.DataFrame(ValidSegment)
     dfV.to_csv('../../temp2.csv',index=True,header=True)
+    dfV2=pd.DataFrame(PreData2D)
+    dfV2.to_csv('../../temp3.csv',index=True,header=True)
     #print(dfv)
     #print(len(ValidSegment))
     #print(ValidSegment[])

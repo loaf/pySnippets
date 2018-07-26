@@ -11,7 +11,7 @@ class SSHConnection(object):
         self._client = None
         self._connect()  # 建立连接
 
-     def _connect(self):
+    def _connect(self):
         transport = paramiko.Transport((self._host, self._port))
         transport.connect(username=self._username, password=self._password)
         self._transport = transport
@@ -36,11 +36,11 @@ class SSHConnection(object):
         stdin, stdout, stderr = self._client.exec_command(command)
         data = stdout.read()
         if len(data) > 0:
-            print data.strip()   #打印正确结果
+            print(data.strip())   #打印正确结果
             return data
         err = stderr.read()
         if len(err) > 0:
-            print err.strip()    #输出错误结果
+            print(err.strip()) #输出错误结果
             return err
 
     def close(self):
@@ -54,12 +54,12 @@ if __name__ == "__main__":
     conn = SSHConnection('192.168.1.1', 22, 'username', 'password')
     localpath = 'hello.txt'
     remotepath = '/home/hupeng/WorkSpace/Python/test/hello.txt'
-    print 'downlaod start'
+    print('downlaod start')
     conn.download(remotepath, localpath)
-    print 'download end'
-    print 'put begin'
+    print('download end')
+    print('put begin')
     conn.put(localpath, remotepath)
-    print 'put end'
+    print('put end')
 
     conn.exec_command('whoami')
     conn.exec_command('cd WorkSpace/Python/test;pwd')  #cd需要特别处理
