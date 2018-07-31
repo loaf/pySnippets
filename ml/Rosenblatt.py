@@ -66,7 +66,7 @@ plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x', label='versico
 plt.xlabel('petal length')
 plt.ylabel('sepal length')
 plt.legend(loc='upper left')
-#plt.show()
+plt.show()
 
 #训练数据，显示收敛度
 ppn = Perceptron(eta=0.1, n_iter=10)
