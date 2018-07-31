@@ -31,7 +31,6 @@ class Perceptron(object):
 
         for _ in range(self.n_iter):
             errors = 0
-
             for xi, target in zip(X, y): #zip将两个对象打包成一个元组，比如这里，X是一个100x2的阵列，100行，每行2列，而y是100行，每行1列，打包后，相当于[(x1,x2),y1]
                 update = self.eta*(target - self.predict(xi))
                 self.w_[1:] += update*xi #很显然，如果上一行括号里两个值相等，相当于实际值和预测量相同，这时update=0,则w_的值不会变化
@@ -51,6 +50,7 @@ class Perceptron(object):
 #开始训练
 import pandas as pd
 df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', header=None)
+df = df.sample(10) #为了调试方便，随机取10个数
 #print(df.tail())
 
 import matplotlib.pyplot as plt
