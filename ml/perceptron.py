@@ -53,8 +53,10 @@ class perceptron(object):
 
     def net_input(self,X):
         """Calculate net input对于一个神经元节点，总是将它的值与权重值相乘"""
-        return  np.dot(X,self.w_[1:]+self.w_[0])
+        return  np.dot(X,self.w_[1:])+self.w_[0]
 
     def predict(self,X):
         """Return class label after unit step"""
         return np.where(self.net_input(X)>=0.0,1,-1)
+
+
