@@ -1,14 +1,13 @@
 # coding=utf-8
 import pandas as pd
-import os
+# import os
+import time
 
-rTP=1.0 #Take Profit止盈为100%，相当于翻了一倍
-rSL=0.1 #Stop loss止损 10%
+rTP=1.0 # Take Profit止盈为100%，相当于翻了一倍
+rSL=0.1 # Stop loss止损 10%
 PreDay=5 #前置天数
-ValidSegment=[[]] #记录有效的段，由一个3元数组组成，一个是入口的ID，一个是出口的ID，一个是段的跨度n
 
-inPreData2D=[] #记录入市点前5天的数据形成的2维数组
-outPreData2D=[]#记录出市点前5天的数据形成的2维数组
+anyPreData2D=[] #记录任意一点的前5天数据形成的2维数组
 
 
 def getDataFrame(fileName):
@@ -51,80 +50,58 @@ def searchOutPoint(data,ix): #从当前点按动态止赢的方法查找有效�
         j=j+1
     return j
 
-def SaveInOutPoint(InPoint,OutPoint):  #将入市点，出市点和间隔交易日记录下来
-    ...
-    return True
 
-def SaveToInPointDatabase(): #将入市点前PreDay天的数据保存到待分析的材料库，可以根据上面的outTime和intervalDay为这些数据打上带权重的标签
-    ...
-    return True
+def savePre_N_data(data,ix): #将当前点前5天的数据保存下来
+    PreDataList=['Any']
+    PreDataList.append(data.iloc[ix]['代码'])
+    PreDataList.append(data.iloc[ix]['日期'])
+    PreDataList.append(ix)
+    PreDataList.append(0)
+    for i in list(range(PreDay,0,-1)):
+        PreDataList.append(data.iloc[ix - i]['开盘价(元)'])
+        PreDataList.append(data.iloc[ix - i]['最高价(元)'])
+        PreDataList.append(data.iloc[ix - i]['最低价(元)'])
+        PreDataList.append(data.iloc[ix - i]['收盘价(元)'])
+        PreDataList.append(data.iloc[ix - i]['均价(元)'])
+        PreDataList.append(data.iloc[ix - i]['换手率(%)'])
+    PreDataList.append(0)
+    PreDataList.append(0)
+    return PreDataList
 
-def SaveToOutPointDatabase(): #将出市点前PreDay天的数据保存到待分析的材料库，分析出市的的前置规律，不过，因为规则已确定，有没有必要另说
-    ...
-    return True
 
 if __name__ == "__main__":
+
+    print('Begin:',time.strftime('%X',time.localtime(time.time())))
 
     df=getDataFrame('../../Quant/stock/Data/SZ/000835.SZ.CSV')
     df=clearData(df)
     df.to_csv('../../temp1.csv',index=True,header=True)
 
+    outPreDataList=[]
 
-    for i in range(5, len(df)):
+    for i in range(PreDay, len(df)):
         curTime=df.iloc[i]['日期']
         curPrice=df.iloc[i]['收盘价(元)']
 
         outIX=searchInPoint(df,i)
 
-        if  outIX > 0:
-            ValidSegment.append([i, outIX, outIX-i])
+        preDatalist=savePre_N_data(df,i)
 
-    dfV = pd.DataFrame(ValidSegment)
-    dfV.to_csv('../../temp2.csv', index=True, header=True)
+        if outIX > 0:
+            preDatalist[0]='IN'
+            preDatalist[4]=outIX
+            preDatalist[PreDay*6+5]=outIX-i
+            preDatalist[PreDay*6+6]=(df.iloc[outIX]['收盘价(元)']-df.iloc[i]['收盘价(元)'])/df.iloc[i]['收盘价(元)']
 
+        anyPreData2D.append(preDatalist)
+    '''
+    print('Begin update OutData:', time.strftime('%X', time.localtime(time.time())))
 
-    for i in range(1,len(ValidSegment)): #第0行是空值
-        IXinpoint=ValidSegment[i][0]
-        IXoutpoint=ValidSegment[i][1]
+    outPreDataList=list(set(outPreDataList))#删除重复值
+    for j in outPreDataList:
+        anyPreData2D[outPreDataList[outPreDataList.index(j)]-5][0]='OUT'
+    '''
+    dfAny=pd.DataFrame(anyPreData2D)
+    dfAny.to_csv('../../tempAny.csv', index=True, header=False)
 
-        MaxHighRate=(df.iloc[IXoutpoint]['收盘价(元)']-df.iloc[IXinpoint]['收盘价(元)'])/df.iloc[IXinpoint]['收盘价(元)']
-
-        PreDataList=['IN']
-        PreDataList.append(df.iloc[IXinpoint]['代码'])
-        PreDataList.append(df.iloc[IXinpoint]['日期'])
-        for j in list(range(5,0,-1)):
-            PreDataList.append(df.iloc[IXinpoint - j]['开盘价(元)'])
-            PreDataList.append(df.iloc[IXinpoint - j]['最高价(元)'])
-            PreDataList.append(df.iloc[IXinpoint - j]['最低价(元)'])
-            PreDataList.append(df.iloc[IXinpoint - j]['收盘价(元)'])
-            PreDataList.append(df.iloc[IXinpoint - j]['均价(元)'])
-            PreDataList.append(df.iloc[IXinpoint - j]['换手率(%)'])
-        PreDataList.append(ValidSegment[i][2])
-        PreDataList.append(MaxHighRate)
-
-        inPreData2D.append(PreDataList)
-
-        outPreDataList=['OUT']
-        outPreDataList.append(df.iloc[IXoutpoint]['代码'])
-        outPreDataList.append(df.iloc[IXoutpoint]['日期'])
-        for j in list(range(5,0,-1)):
-            outPreDataList.append(df.iloc[IXoutpoint - j]['开盘价(元)'])
-            outPreDataList.append(df.iloc[IXoutpoint - j]['最高价(元)'])
-            outPreDataList.append(df.iloc[IXoutpoint - j]['最低价(元)'])
-            outPreDataList.append(df.iloc[IXoutpoint - j]['收盘价(元)'])
-            outPreDataList.append(df.iloc[IXoutpoint - j]['均价(元)'])
-            outPreDataList.append(df.iloc[IXoutpoint - j]['换手率(%)'])
-
-        outPreData2D.append(outPreDataList)
-
-
-    dfV2=pd.DataFrame(inPreData2D)
-    #dfV2=dfV2.dropna()
-    dfV2.to_csv('../../temp3.csv',index=True,header=False)
-    dfV3=pd.DataFrame(outPreData2D)
-    #dfV3=dfV3.dropna()
-    dfV3.to_csv('../../temp4.csv',index=True,header=False)
-    #print(dfv)
-    #print(len(ValidSegment))
-    #print(ValidSegment[])
-   # print(df.head())
+    print('Over:', time.strftime('%X', time.localtime(time.time())))
