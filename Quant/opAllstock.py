@@ -1,14 +1,15 @@
 # coding=utf-8
-import pandas as pd
-# import os
-import time
 
+import os
+import pandas as pd
+
+dataPath='../../Quant/stock/Data/SZ'
+ProcessedPath='../../Quant/stock/Data/Processed'
 rTP=1.0 # Take Profit止盈为100%，相当于翻了一倍
 rSL=0.1 # Stop loss止损 10%
 PreDay=5 #前置天数
 
 anyPreData2D=[] #记录任意一点的前5天数据形成的2维数组
-
 
 def getDataFrame(fileName):
     f=open(fileName)
@@ -66,41 +67,36 @@ def savePre_N_data(data,ix): #将当前点前5天的数据保存下来
     PreDataList.append(0)
     PreDataList.append(0)
     return PreDataList
-
-
 if __name__ == "__main__":
+    for f in os.listdir(dataPath):
+        fi = os.path.join(dataPath, f)
 
-    print('Begin:',time.strftime('%X',time.localtime(time.time())))
+        if os.path.isdir(fi) or os.path.splitext(f)[1] != ".CSV":
+            continue
 
-    df=getDataFrame('../../Quant/stock/Data/SZ/000001.SZ.CSV')
-    df=clearData(df)
-    #df.to_csv('../../temp1.csv',index=True,header=True)
+        if os.path.exists(os.path.join(ProcessedPath, f)):
+            continue
 
-    outPreDataList=[]
+        df = getDataFrame(fi)
+        df = clearData(df)
+        #df.to_csv('../../temp1.csv', index=True, header=True)
 
-    for i in range(PreDay, len(df)):
-        curTime=df.iloc[i]['日期']
-        curPrice=df.iloc[i]['收盘价(元)']
+        for i in range(PreDay, len(df)):
+            curTime = df.iloc[i]['日期']
+            curPrice = df.iloc[i]['收盘价(元)']
 
-        outIX=searchInPoint(df,i)
+            outIX = searchInPoint(df, i)
+            preDatalist = savePre_N_data(df, i)
 
-        preDatalist=savePre_N_data(df,i)
+            if outIX > 0:
+                preDatalist[0] = 'IN'
+                preDatalist[4] = outIX
+                preDatalist[PreDay * 6 + 5] = outIX - i
+                preDatalist[PreDay * 6 + 6] = (df.iloc[outIX]['收盘价(元)'] - df.iloc[i]['收盘价(元)']) / df.iloc[i]['收盘价(元)']
 
-        if outIX > 0:
-            preDatalist[0]='IN'
-            preDatalist[4]=outIX
-            preDatalist[PreDay*6+5]=outIX-i
-            preDatalist[PreDay*6+6]=(df.iloc[outIX]['收盘价(元)']-df.iloc[i]['收盘价(元)'])/df.iloc[i]['收盘价(元)']
+            anyPreData2D.append(preDatalist)
 
-        anyPreData2D.append(preDatalist)
-    '''
-    print('Begin update OutData:', time.strftime('%X', time.localtime(time.time())))
+        dfAny = pd.DataFrame(anyPreData2D)
+        dfAny.to_csv(os.path.join(ProcessedPath, f), index=True, header=False)
 
-    outPreDataList=list(set(outPreDataList))#删除重复值
-    for j in outPreDataList:
-        anyPreData2D[outPreDataList[outPreDataList.index(j)]-5][0]='OUT'
-    '''
-    dfAny=pd.DataFrame(anyPreData2D)
-    dfAny.to_csv('../../tempAny001.csv', index=True, header=False)
 
-    print('Over:', time.strftime('%X', time.localtime(time.time())))
