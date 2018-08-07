@@ -69,6 +69,7 @@ def savePre_N_data(data,ix): #将当前点前5天的数据保存下来
     return PreDataList
 if __name__ == "__main__":
     for f in os.listdir(dataPath):
+        preDataDf=[]
         fi = os.path.join(dataPath, f)
 
         if os.path.isdir(fi) or os.path.splitext(f)[1] != ".CSV":
@@ -94,9 +95,9 @@ if __name__ == "__main__":
                 preDatalist[PreDay * 6 + 5] = outIX - i
                 preDatalist[PreDay * 6 + 6] = (df.iloc[outIX]['收盘价(元)'] - df.iloc[i]['收盘价(元)']) / df.iloc[i]['收盘价(元)']
 
-            anyPreData2D.append(preDatalist)
+            preDataDf.append(preDatalist)
 
-        dfAny = pd.DataFrame(anyPreData2D)
+        dfAny = pd.DataFrame(preDataDf)
         dfAny.to_csv(os.path.join(ProcessedPath, f), index=True, header=False)
 
 
