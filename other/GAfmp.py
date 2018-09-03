@@ -9,18 +9,19 @@ import matplotlib.pyplot as plt
 import math
 import random
 import numpy as np
+import pandas as pd
 
 #对用一个二维矩阵表示一代种群，每一行代表一个个体（有一个染色体），是一个17位数组，表示一个17位的2进制数,为了计算方便，低位在前
 def init():
     for i in range(0,population_size):
         for j in range(0,chromosome_size):
             generation[i,j]=round(random.random())
-        generation[i,chromosome_size]=9#最后一列表示是否被 淘汰
+        generation[i,chromosome_size]=5#最后一列表示是否被 淘汰
     return generation
 
-#对这代种群的每一个个体，分别计算适应度
+#对这代种群的每一个个体，分别计算适应度,得到一个标注后的本代矩阵和一个包括所有代的信息列表gen_info
 def fitness(cur_gen):
-    global parent_gen,child_gen
+    global parent_gen,gen_info
     parent_fitness=np.zeros([population_size,2])
     gv_x=0
     for i in range(population_size):
@@ -35,77 +36,86 @@ def fitness(cur_gen):
     sortV=parent_fitness[np.lexsort(-parent_fitness.T)] #按f(x)值排序
     parent_avg=sortV.mean(axis=0)[1] #此代的平均适应度
     parent_best_fitness=sortV[0,1]#此代的最优适应度
-    parent_best_inv=0 #j最优个体，用10进制表示
+    parent_min_fitness=sortV[population_size-1,1] #此代的最差适应度
+
+    #df1=pd.DataFrame(parent_fitness)
+    #df2=pd.DataFrame(sortV)
+    #df1.to_csv("../../temp/parent_fitness.csv")
+    #df2.to_csv("../../temp/sortV.csv")
+
+    parent_best_inv = 0  ##此代最好个体的十进制表示
     for i in range(chromosome_size):
-        if parent_fitness[int(sortV[0,0],i)]==1:
+        if parent_gen[int(sortV[0,0]),i]==1:
             parent_best_inv=parent_best_inv+2**i
+
     #将此代的代数、平均适应度、最优适应度、最优个体保留到一个数列中
-    gen_info.append([cur_gen,parent_avg,parent_best_fitness,parent_best_inv])
+    gen_info.append([cur_gen,parent_avg,parent_best_fitness,parent_best_inv,parent_min_fitness])
 
-    #淘汰父代，保留80%
+    #淘汰父代，前10%直接保留，后面的对每一行，轮盘赌决定是否保留
+    for i in range(int(population_size*elitism_rate)):
+        parent_gen[int(sortV[i,0]), chromosome_size] = 9
+
+    sumFitness=sum(sortV[int(population_size*elitism_rate):,1])+(population_size-int(population_size*elitism_rate))*abs(parent_min_fitness)
+    accumulator = 0 #累积概率
     for i in range(int(population_size*elitism_rate),population_size):
-        parent_gen[i,chromosome_size]=-9
+        rndValue=random.random() #取一个[0,1)之间的随机数
+        accumulator += (sortV[i, 1] + abs(parent_min_fitness))/sumFitness
 
-    if elitism_rate>0: #保留精英
-        for i in range(int(population_size*elitism_rate)):
-            child_gen[i]=parent_gen[i]
+        if rndValue>= accumulator:
+            parent_gen[int(sortV[i,0]), chromosome_size] = 8
+        else:
+            parent_gen[int(sortV[i,0]), chromosome_size] = -8
 
+    #df=pd.DataFrame(parent_gen)
+    #df.to_csv("../../temp/gen.csv")
 
+    temp_gen = parent_gen[parent_gen[:, chromosome_size] > 0, :]
+    rnd = math.floor(random.uniform(0, len(temp_gen) - 2))
+    chromosome_Father = temp_gen[rnd, 0:17]
+    chromosome_Mather = temp_gen[rnd + 1, 0:17]
+    cross_position = math.ceil(random.uniform(1, chromosome_size - 1))
+    child1 = chromosome_Father[:cross_position]
+    child1.extend(chromosome_Mather[cross_position:])
+    child2 = chromosome_Mather[:cross_position]
+    child2.extend(chromosome_Father[cross_position:])
+    print(chromosome_Father,chromosome_Mather)
+    print(child1,child2)
 
-#评估,对个体按适应度大小进行排序，并且保存最佳个体
-def rank(population_size, chromosome_size,cur_gen):
-    global gen_info
-    sortV = gen_fitness_Value[np.lexsort(-gen_fitness_Value.T)]
-    gen_mean_Value=sortV.mean(axis=0)[1]
-    gen_best_Value=sortV[0,1]
+    #对于所有的染色体数据按变异概率进行变异
 
-    gen_best_inv=0 #最优个体
-    for i in range(17):
-        if generation[int(sortV[0,0]),i]==1:
-            gen_best_inv=gen_best_inv+2**i
-
-    gen_info[cur_gen,0]=cur_gen
-    gen_info[cur_gen,1]=gen_mean_Value
-    gen_info[cur_gen,2]=gen_best_Value
-    gen_info[cur_gen,3]=gen_best_inv
-
-    print(gen_info)
-
-
+#单点交叉,每次从父代中随机取2个作为父母，按交叉概率进行染色体交换,方法为，取一个随机数，如果大于交叉概率，不做操作
+#交叉方式是，随机取一个[2,16）的值，作为交叉开始点，将开始点后的数据互换，执行100次，填到child_gen中
+def crossover(curGen, cross_rate):
+    temp_gen=parent_gen[parent_gen[:,chromosome_size]>0,:] #将保留下来的父代放到一个临时数组中
+    for i in range(population_size): #执行100次，填满child_gen
+        rnd=math.floor(random.uniform(0,len(temp_gen)-2)) #从有效数组中取一个值，如果一共有40行，则范围是[0,38)，为了省事，直接取相邻的两条做父母
+        chromosome_Father=temp_gen[rnd,0:17]
+        chromosome_Mather=temp_gen[rnd+1,0:17]
+        if random.random()<cross_rate:
+            cross_position=math.ceil(random.uniform(1,chromosome_size-1)) #第3位到17位取一个随机位
+            child1=chromosome_Father[:cross_position]+chromosome_Mather[cross_position:]
+            child2=chromosome_Mather[:cross_position]+chromosome_Father[cross_position:]
+        print(chromosome_Father)
     return
-#轮盘赌选择
-def selection(population_size,chromosome_size,elitism):
-    ...
-#单点交叉
-def crossover(population_size, chromosome_size, cross_rate):
-    ...
 
-#单点变异操作
-def mutation(population_size, chromosome_size, mutate_rate):
+#单点变异操作，对于每一行个体，取一个随机数，如果小于变异概率，则该条发生变异，然后在此中，随机取一个[0,16)的位置上求反操作
+def mutation(mutate_rate):
     return
 
 def main():
     global elitism,population_size,chromosome_size,generation_size,cross_rate,mutate_rate,parent_gen
 
     parent_gen=init()
+    fitness(1)
 
-    for i in range(int(population_size*elitism_rate),population_size):
-        random.random()
-        parent_gen[i, chromosome_size] = -9
-    print(parent_gen)
-
-
-    for i in range(0,generation_size):
+    #for i in range(0,generation_size):
         #fitness(i)
         #rank(population_size,chromosome_size,i)
         # selection(population_size,chromosome_size,elitism)
         # crossover(population_size,chromosome_size,cross_rate)
-        mutation(population_size,chromosome_size,mutate_rate)
-
+        #mutation(population_size,chromosome_size,mutate_rate)
 
     #print(gen_fitness_Value)
-
-
 
 
 
