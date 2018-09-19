@@ -116,7 +116,7 @@ def main():
     plt.show()
 
 
-elitism_rate=0.01 #精英比例
+elitism_rate=0.0 #精英比例
 population_size = 100 #种群大小
 chromosome_size = 17#染色体长度
 generation_size = 200 #200最大迭代次数
