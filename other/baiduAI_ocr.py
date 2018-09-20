@@ -1,6 +1,7 @@
 # encoding: utf-8
 import time
 import sys
+import os
 #reload(sys)
 #sys.setdefaultencoding('utf-8')
 time1 = time.time()
@@ -8,6 +9,10 @@ time1 = time.time()
 import urllib.request,urllib.parse,base64
 import json
 import re
+
+
+dataPath='e:/6/five/'
+ocroutPath='e:/6/five_text/'
 
 def get_token(API_Key,Secret_Key):
     # 获取access_token
@@ -38,19 +43,48 @@ def recognition_word_high(filepath,filename,access_token):
     response = urllib.request.urlopen(request)
     content = response.read().decode("utf8")
     #print(content)
+    retStr=""
 
     if (content):
         # print(content)
         world=re.findall('"words": "(.*?)"}',str(content),re.S)
         for each in world:
-            print(each)
+            retStr += each
+
+    return retStr
 
 
 
 if __name__ == '__main__':
     API_Key = "Ta45HPVPVc1PYMkoL52Gr0Vh"
     Secret_Key = "GFCAYKjltuzUkma9m3q4FDoSrXIhV42g"
-    filepath = "G:/6/"
-    filename="five049.jpg"
-    access_token=get_token(API_Key,Secret_Key)
-    recognition_word_high=recognition_word_high(filepath,filename,access_token)
+
+    access_token = get_token(API_Key, Secret_Key)
+    for f in os.listdir(dataPath):
+        fi = os.path.join(dataPath, f)
+
+        if os.path.isdir(fi) or os.path.splitext(f)[1] != ".jpg":
+            continue
+
+        outFileName=os.path.splitext(f)[0]+".txt"
+
+        fo=open(os.path.join(ocroutPath, outFileName),'w')
+
+
+        #access_token = get_token(API_Key, Secret_Key)
+        s =  recognition_word_high(dataPath, f, access_token)
+        fo.write(s)
+        fo.close()
+
+
+
+    '''
+    filepath = "E:/6/five/"
+    filename="f049.jpg"
+    fo=open('e:/6/five_text/f049.txt','w')
+
+
+    print(str)
+    fo.write(str)
+    fo.close()
+    '''
