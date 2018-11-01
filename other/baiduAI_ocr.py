@@ -11,8 +11,8 @@ import json
 import re
 
 
-dataPath='e:/6/five/'
-ocroutPath='e:/6/five_text/'
+dataPath='e:/6/xin/'
+ocroutPath='e:/6/xin_text/'
 
 def get_token(API_Key,Secret_Key):
     # 获取access_token
@@ -28,7 +28,8 @@ def get_token(API_Key,Secret_Key):
     return access_token
 
 def recognition_word_high(filepath,filename,access_token):
-    url='https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic?access_token=' + access_token
+    #url='https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic?access_token=' + access_token
+    url = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=' + access_token
     # 二进制方式打开图文件
     f = open(filepath + filename, 'rb')  # 二进制方式打开图文件
     # 参数image：图像base64编码
