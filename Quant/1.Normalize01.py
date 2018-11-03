@@ -3,8 +3,10 @@
 
 import os
 import pandas as pd
+import pymysql
+from sqlalchemy import create_engine
 
-dataPath='../../Quant/stock/Data/Test'
+dataPath='../../Quant/stock/Data/SH'
 ProcessedPath='../../Quant/stock/Data/Nop' #归一化后的目录
 
 
@@ -26,6 +28,8 @@ def clearData(data):
 
 
 if __name__ == "__main__":
+    mySQLconnect = create_engine('mysql+pymysql://mystock:myQuant@loafnas.myqnapcloud.com:3306/mystock?charset=utf8')
+
     for f in os.listdir(dataPath):
         NormalizeDF=[]
         fi = os.path.join(dataPath, f)
@@ -33,8 +37,8 @@ if __name__ == "__main__":
         if os.path.isdir(fi) or os.path.splitext(f)[1] != ".CSV":
             continue
 
-        if os.path.exists(os.path.join(ProcessedPath, f)):
-            continue
+        #if os.path.exists(os.path.join(ProcessedPath, f)):
+        #    continue
 
         df = getDataFrame(fi)
         df = clearData(df)
@@ -56,6 +60,9 @@ if __name__ == "__main__":
 
 
         dfAny = pd.DataFrame(NormalizeDF)
-        dfAny.to_csv(os.path.join(ProcessedPath, f), index=False, header=True)
+        dfAny.columns=['code','name','date','high','low','close','avgprice','change','pe','pb']
+        #dfAny.to_csv(os.path.join(ProcessedPath, f), index=False, header=True)
+        pd.io.sql.to_sql(dfAny, os.path.splitext(f)[0], mySQLconnect, schema='mystock', if_exists='append')
+        print(os.path.splitext(f)[0]+' is OK!')
 
 
