@@ -6,7 +6,7 @@ import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 
-dataPath='../../Quant/stock/Data/SH'
+dataPath='../../Quant/stock/Data/1'
 ProcessedPath='../../Quant/stock/Data/Nop' #归一化后的目录
 
 

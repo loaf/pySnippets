@@ -480,7 +480,7 @@ requestMaxTimeout = 300
 
 wantedFormats = ['kfx', 'azw4', 'azw3', 'azw', 'epub', 'mobi']
 outputFileName = 'booklist.txt'
-libraryStorage = r'c:\Temp\ScriptedBookDownloads\ALL'
+libraryStorage = r'e:\Temp\all'
 
 #
 # </CONFIGURABLES>
@@ -522,8 +522,8 @@ else:
 		calibreAddresses.append(serverAddress)
 '''
 if len(sys.argv) == 1:
-	#scriptInput="220.189.209.76:8080"
-	scriptInput="http://42.51.41.148:9999/"
+	scriptInput="220.189.209.76:8080"
+	#scriptInput="http://42.51.41.148:9999/"
 	if os.path.isfile(scriptInput):
 
 		with open(scriptInput, mode='r', encoding='utf-8') as f:
