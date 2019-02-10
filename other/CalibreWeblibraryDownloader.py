@@ -244,15 +244,19 @@ def DownloadFile(fileURL, filePath, fileName):
 
 
 def DownloadLibrary(calibreAddress, libraryItem, multiLibrary):
-	
+	#multiLibrary=True
+	#pageSoup=GetSoup(r'http://47.199.81.242:8081/mobile?num=1000&start=550&search=&sort=date&order=descending&library_id=Calibre20180901')
+
 	if multiLibrary:
 		print('Enumerating books in library ' + str(libraryItem['name']))
+		#if str(libraryItem['name'])=='':
+		#	return
 		pageSoup = GetSoup(r'http://' + calibreAddress + r'/mobile?library_id=' + str(libraryItem['id']) + ';search=;order=descending;sort=author;num=9999999;start=1')
 	else:
 		print('Enumerating books')
 		pageSoup = GetSoup(r'http://' + calibreAddress + r'/mobile?search=;order=descending;sort=author;num=9999999;start=1')
 	#
-	
+
 	if ':' in calibreAddress:
 		calibreIP = calibreAddress[:calibreAddress.rfind(':')]
 	else:
@@ -478,9 +482,9 @@ ruleList = json.loads(jsonRulesData)['rules']
 useProxies = False
 requestMaxTimeout = 300
 
-wantedFormats = ['kfx', 'azw4', 'azw3', 'azw', 'epub', 'mobi']
+wantedFormats = ['kfx', 'azw4', 'azw3', 'azw', 'epub', 'mobi','pdf']
 outputFileName = 'booklist.txt'
-libraryStorage = r'e:\Temp\all'
+libraryStorage = r'e:\Temp\all2'
 
 #
 # </CONFIGURABLES>
@@ -522,8 +526,12 @@ else:
 		calibreAddresses.append(serverAddress)
 '''
 if len(sys.argv) == 1:
-	scriptInput="220.189.209.76:8080"
+	scriptInput="http://47.199.81.242:8081/"
+	#scriptInput="http://75.154.176.113:8080"
+	#scriptInput="http://220.189.209.76:8080/"
 	#scriptInput="http://42.51.41.148:9999/"
+	#scriptInput="http://202.203.132.245:8080"
+	#scriptInput="http://99.242.37.88:8080/"
 	if os.path.isfile(scriptInput):
 
 		with open(scriptInput, mode='r', encoding='utf-8') as f:
