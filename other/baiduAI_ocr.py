@@ -11,8 +11,8 @@ import json
 import re
 
 
-dataPath='g:/6/xt/'
-ocroutPath='g:/6/xt_text/'
+dataPath='c:/data/1/'
+ocroutPath='c:/data/1text/'
 
 def get_token(API_Key,Secret_Key):
     # 获取access_token

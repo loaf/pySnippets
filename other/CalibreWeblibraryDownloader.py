@@ -89,7 +89,6 @@ def GetHead(url):
 
 #
 
-
 def EvaluateAccordingToRules(bookTitle):
 	
 	bookWanted = True
@@ -183,7 +182,6 @@ def EvaluateAccordingToRules(bookTitle):
 	return bookWanted
 #
 
-
 def DownloadFile(fileURL, filePath, fileName):
 	
 	downloadSuccessful = False
@@ -238,10 +236,8 @@ def DownloadFile(fileURL, filePath, fileName):
 	else:
 		
 		print('File ' + str(fileName) + ' downloaded before, skipping')
-		
 	#
 #
-
 
 def DownloadLibrary(calibreAddress, libraryItem, multiLibrary):
 	
@@ -456,17 +452,12 @@ def DownloadLibrary(calibreAddress, libraryItem, multiLibrary):
 	
 	print('Library ' + str(calibreAddress) + ' processed' + '\n' + '----------------------------------')
 #
-
-
-
-
-
 #
 # <CONFIGURABLES>
 #
 
-
 # 
+
 requests.packages.urllib3.disable_warnings()
 proxyDict = {}
 randomUserAgent = fake_useragent.UserAgent().random
@@ -478,9 +469,9 @@ ruleList = json.loads(jsonRulesData)['rules']
 useProxies = False
 requestMaxTimeout = 300
 
-wantedFormats = ['kfx', 'azw4', 'azw3', 'azw', 'epub', 'mobi']
+wantedFormats = ['kfx', 'azw4', 'azw3', 'azw', 'epub', 'mobi','pdf']
 outputFileName = 'booklist.txt'
-libraryStorage = r'e:\Temp\all'
+libraryStorage = r'c:\Temp\ScriptedBookDownloads\a2'
 
 #
 # </CONFIGURABLES>
@@ -522,8 +513,9 @@ else:
 		calibreAddresses.append(serverAddress)
 '''
 if len(sys.argv) == 1:
-	scriptInput="220.189.209.76:8080"
+	#scriptInput="220.189.209.76:8080"
 	#scriptInput="http://42.51.41.148:9999/"
+	scriptInput="http://183.51.191.114:5555/"
 	if os.path.isfile(scriptInput):
 
 		with open(scriptInput, mode='r', encoding='utf-8') as f:
