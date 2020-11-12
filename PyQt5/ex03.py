@@ -1,17 +1,18 @@
-# Coding=utf8
-from PyQt5.QtCore import QObject,pyqtSlot
+# Coding=utf-8
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QSystemTrayIcon,QApplication
 
-'''Õâ¸öÀà¶¨Òåä¯ÀÀÆ÷ÊÓÍ¼µÄÄÚÈÝ'''
+'''ï¿½ï¿½ï¿½ï¿½à¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'''
 class BrowserScreen(QWebEngineView):
     def __init__(self):
         QWebEngineView.__init__(self)
 
         self.resize(800, 600)
         self.show()
-        #Ôö¼ÓÁËÒ»ÐÐ <script src="qrc:///qtwebchannel/test.js"></script>
+        #å¢žåŠ äº†<script src="qrc:///qtwebchannel/test.js"></script>
         self.setHtml("""
             <script src="qrc:///qtwebchannel/test.js"></script>
            <script>function message() { return "Clicked!"; }</script>
@@ -56,11 +57,14 @@ if __name__=='__main__':
     browser = BrowserScreen()
     pjs = PythonJS()
 
-    #¼ÓÒ»¸öchannel
+    #ï¿½ï¿½Ò»ï¿½ï¿½channel
     channel=QWebChannel()
-    handler=CallHandler()
-    browser.page().mainFrame().addToJavaScriptWindowObject("python", pjs)
-    QObject.connect(pjs, SIGNAL("contentChanged(const QString &)"),
-                    browser.showMessage)
+    pjs = PythonJS()
+
+    channel.registerObject('python', pjs)
+    browser.page().setWebChannel(channel)
+
+
+    #QObject.connect(pjs, pyqtSignal("contentChanged(const QString &)"),browser.showMessage)
 
     sys.exit(app.exec_())
