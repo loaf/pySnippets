@@ -1,4 +1,5 @@
 #coding=utf8
+# 在PyQt5中使用javascript，使用runJavaScript()
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
 
