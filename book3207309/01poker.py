@@ -4,7 +4,7 @@
 
 
 class Card:
-    """ A playing card"""
+    """ 一张牌"""
     RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
     SUITS = ["梅", "方", "红", "黑"]  # "梅"为梅花，"方"为方钻，"红"为红心，"黑”为黑桃
 
@@ -22,15 +22,15 @@ class Card:
 
     def pic_order(self):  # 牌的顺序
         if self.rank == "A":
-            FaceNum = 1
+            face_num = 1
         elif self.rank == "J":
-            FaceNum = 11
+            face_num = 11
         elif self.rank == "Q":
-            FaceNum = 12
+            face_num = 12
         elif self.rank == "K":
-            FaceNum = 13
+            face_num = 13
         else:
-            FaceNum = int(self.rank)
+            face_num = int(self.rank)
 
         if self.suit == "梅":
             Suit = 1
@@ -41,14 +41,14 @@ class Card:
         else:
             Suit = 4
 
-        return (Suit - 1) * 13 + FaceNum
+        return (Suit - 1) * 13 + face_num
 
     def flip(self):  # 翻牌方法
         self.is_face_up = not self.is_face_up
 
 
 class Hand:
-    """A hand of playing cards."""
+    """A hand of playing cards.一手牌"""
 
     def __init__(self):
         self.cards = []
@@ -58,9 +58,9 @@ class Hand:
             rep = ""
             for card in self.cards:
                 rep += str(card) + "\t"
-            else:
-                rep = "无牌"
-            return rep
+        else:
+            rep = "无牌"
+        return rep
 
     def clear(self):
         self.cards = []
